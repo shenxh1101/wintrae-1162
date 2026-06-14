@@ -131,11 +131,11 @@ class Statement {
   evalCondition(row, condition, params) {
     if (!condition) return true;
 
-    const parts = this.splitConditions(condition);
-    return parts.every(part => this.evalSingleCondition(row, part, params));
+    const andParts = this.splitByTopLevelOp(condition, 'AND');
+    return andParts.every(part => this.evalOrExpr(row, part, params));
   }
 
-  splitConditions(condition) {
+  splitByTopLevelOp(condition, op) {
     const result = [];
     let depth = 0;
     let current = '';
@@ -143,7 +143,7 @@ class Statement {
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
-      if (token.toUpperCase() === 'AND' && depth === 0 && current.trim()) {
+      if (token.toUpperCase() === op && depth === 0 && current.trim()) {
         result.push(current.trim());
         current = '';
       } else {
@@ -154,6 +154,32 @@ class Statement {
     }
     if (current.trim()) result.push(current.trim());
     return result;
+  }
+
+  evalOrExpr(row, expr, params) {
+    expr = expr.trim();
+    if (expr.startsWith('(') && expr.endsWith(')')) {
+      let depth = 0;
+      let balanced = true;
+      for (const ch of expr) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        if (depth < 0) { balanced = false; break; }
+      }
+      if (balanced && depth === 0) {
+        expr = expr.substring(1, expr.length - 1).trim();
+      }
+    }
+
+    const orParts = this.splitByTopLevelOp(expr, 'OR');
+    if (orParts.length === 1) {
+      return this.evalSingleCondition(row, orParts[0].trim(), params);
+    }
+    return orParts.some(part => this.evalSingleCondition(row, part.trim(), params));
+  }
+
+  splitConditions(condition) {
+    return this.splitByTopLevelOp(condition, 'AND');
   }
 
   evalSingleCondition(row, condition, params) {

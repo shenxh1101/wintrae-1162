@@ -38,10 +38,10 @@ function promoteWaitlist(eventId) {
     const newStatus = event.require_approval ? 'pending' : 'approved';
     if (newStatus === 'approved') {
       db.prepare("UPDATE registrations SET status = 'approved', queue_position = NULL, approved_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(nextWaitlist.id);
-      slotsAvailable--;
     } else {
       db.prepare("UPDATE registrations SET status = 'pending', queue_position = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?").run(nextWaitlist.id);
     }
+    slotsAvailable--;
 
     promoted.push({ id: nextWaitlist.id, user_name: nextWaitlist.user_name, to_status: newStatus });
     writeAuditLog(eventId, nextWaitlist.id, 'waitlist_promoted', { to_status: newStatus });

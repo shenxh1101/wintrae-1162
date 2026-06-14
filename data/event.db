@@ -1,0 +1,477 @@
+{
+  "tables": {
+    "organizers": [
+      {
+        "id": 1,
+        "username": "admin",
+        "password": "$2a$10$IijcAEKCGBaB/dRgkE9tduxhlgNA9fqCW.yeXO3U89EGruj/wy7MK",
+        "name": "默认管理员",
+        "callback_url": null,
+        "created_at": "2026-06-14 12:29:15"
+      }
+    ],
+    "events": [
+      {
+        "organizer_id": 1,
+        "title": "Approval Test",
+        "description": null,
+        "location": "Room A",
+        "start_time": "2026-08-01 10:00:00",
+        "end_time": null,
+        "capacity": 2,
+        "waitlist_limit": 5,
+        "require_approval": 1,
+        "form_fields": null,
+        "id": 1,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08",
+        "status": "published"
+      },
+      {
+        "organizer_id": 1,
+        "title": "Approval Test",
+        "description": null,
+        "location": "Room A",
+        "start_time": "2026-08-01 10:00:00",
+        "end_time": null,
+        "capacity": 2,
+        "waitlist_limit": 5,
+        "require_approval": 1,
+        "form_fields": null,
+        "id": 2,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00",
+        "status": "published"
+      }
+    ],
+    "registrations": [
+      {
+        "event_id": "1",
+        "user_identifier": "u0",
+        "user_name": "Alice",
+        "user_phone": "13800000000",
+        "user_email": null,
+        "form_data": null,
+        "status": "approved",
+        "queue_position": null,
+        "checkin_code": "dddcbb9d992041f7",
+        "id": 1,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08",
+        "approved_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "user_identifier": "u1",
+        "user_name": "Bob",
+        "user_phone": "13800000001",
+        "user_email": null,
+        "form_data": null,
+        "status": "approved",
+        "queue_position": null,
+        "checkin_code": "b459dc5281d54c27",
+        "id": 2,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08",
+        "approved_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "user_identifier": "u2",
+        "user_name": "Carol",
+        "user_phone": "13800000002",
+        "user_email": null,
+        "form_data": null,
+        "status": "pending",
+        "queue_position": null,
+        "checkin_code": "58a3c078a140420e",
+        "id": 3,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "user_identifier": "u3",
+        "user_name": "Dave",
+        "user_phone": "13800000003",
+        "user_email": null,
+        "form_data": null,
+        "status": "pending",
+        "queue_position": null,
+        "checkin_code": "5ff3d8ef66f84ded",
+        "id": 4,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "user_identifier": "u4",
+        "user_name": "Eve",
+        "user_phone": "13800000004",
+        "user_email": null,
+        "form_data": null,
+        "status": "pending",
+        "queue_position": null,
+        "checkin_code": "2c568301fbda4502",
+        "id": 5,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "2",
+        "user_identifier": "u0",
+        "user_name": "Alice",
+        "user_phone": "13800000000",
+        "user_email": null,
+        "form_data": null,
+        "status": "cancelled",
+        "queue_position": null,
+        "checkin_code": "b4e97f1a34fe4a7d",
+        "id": 6,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00",
+        "approved_at": "2026-06-14 12:31:00",
+        "cancelled_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "user_identifier": "u1",
+        "user_name": "Bob",
+        "user_phone": "13800000001",
+        "user_email": null,
+        "form_data": null,
+        "status": "cancelled",
+        "queue_position": null,
+        "checkin_code": "2e996a327b2e4ca7",
+        "id": 7,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00",
+        "approved_at": "2026-06-14 12:31:00",
+        "cancelled_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "user_identifier": "u2",
+        "user_name": "Carol",
+        "user_phone": "13800000002",
+        "user_email": null,
+        "form_data": null,
+        "status": "approved",
+        "queue_position": null,
+        "checkin_code": "4366f3c4fa8d45c1",
+        "id": 8,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00",
+        "approved_at": "2026-06-14 12:31:00",
+        "checkin_status": "checked_in",
+        "checkin_time": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "user_identifier": "u3",
+        "user_name": "Dave",
+        "user_phone": "13800000003",
+        "user_email": null,
+        "form_data": null,
+        "status": "pending",
+        "queue_position": null,
+        "checkin_code": "7b9ff54fda664c3d",
+        "id": 9,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "user_identifier": "u4",
+        "user_name": "Eve",
+        "user_phone": "13800000004",
+        "user_email": null,
+        "form_data": null,
+        "status": "waitlist",
+        "queue_position": 1,
+        "checkin_code": "42303a2468d04910",
+        "id": 10,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      }
+    ],
+    "blacklist": [
+      {
+        "organizer_id": 1,
+        "user_identifier": "bad001",
+        "reason": "签到作弊",
+        "id": 1,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "organizer_id": 1,
+        "user_identifier": "bad002",
+        "reason": "无故缺席",
+        "id": 2,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "organizer_id": 1,
+        "user_identifier": "bad003",
+        "reason": "其他原因",
+        "id": 3,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      }
+    ],
+    "audit_logs": [
+      {
+        "event_id": 1,
+        "registration_id": null,
+        "action": "event_created",
+        "details": "{\"title\":\"Approval Test\"}",
+        "id": 1,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": 1,
+        "registration_id": null,
+        "action": "event_updated",
+        "details": "{\"status\":\"published\"}",
+        "id": 2,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 1,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 3,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 2,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 4,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 3,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 5,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 4,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 6,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 5,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 7,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 1,
+        "action": "registration_approved",
+        "details": null,
+        "id": 8,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": "1",
+        "registration_id": 2,
+        "action": "registration_approved",
+        "details": null,
+        "id": 9,
+        "created_at": "2026-06-14 12:30:08",
+        "updated_at": "2026-06-14 12:30:08"
+      },
+      {
+        "event_id": 2,
+        "registration_id": null,
+        "action": "event_created",
+        "details": "{\"title\":\"Approval Test\"}",
+        "id": 10,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": 2,
+        "registration_id": null,
+        "action": "event_updated",
+        "details": "{\"status\":\"published\"}",
+        "id": 11,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 6,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 12,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 7,
+        "action": "registration_created",
+        "details": "{\"status\":\"pending\",\"queue_position\":null}",
+        "id": 13,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 6,
+        "action": "registration_approved",
+        "details": null,
+        "id": 14,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 7,
+        "action": "registration_approved",
+        "details": null,
+        "id": 15,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 8,
+        "action": "registration_created",
+        "details": "{\"status\":\"waitlist\",\"queue_position\":1}",
+        "id": 16,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 9,
+        "action": "registration_created",
+        "details": "{\"status\":\"waitlist\",\"queue_position\":2}",
+        "id": 17,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 10,
+        "action": "registration_created",
+        "details": "{\"status\":\"waitlist\",\"queue_position\":3}",
+        "id": 18,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 6,
+        "action": "registration_cancelled",
+        "details": "{\"old_status\":\"approved\"}",
+        "id": 19,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 8,
+        "action": "waitlist_promoted",
+        "details": "{\"to_status\":\"pending\"}",
+        "id": 20,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 8,
+        "action": "registration_approved",
+        "details": null,
+        "id": 21,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 7,
+        "action": "registration_cancelled",
+        "details": "{\"old_status\":\"approved\"}",
+        "id": 22,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": "2",
+        "registration_id": 9,
+        "action": "waitlist_promoted",
+        "details": "{\"to_status\":\"pending\"}",
+        "id": 23,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": null,
+        "registration_id": null,
+        "action": "blacklist_added",
+        "details": "{\"user_identifier\":\"bad001\",\"reason\":\"签到作弊\"}",
+        "id": 24,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": null,
+        "registration_id": null,
+        "action": "blacklist_added",
+        "details": "{\"user_identifier\":\"bad002\",\"reason\":\"无故缺席\"}",
+        "id": 25,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": null,
+        "registration_id": null,
+        "action": "blacklist_added",
+        "details": "{\"user_identifier\":\"bad003\",\"reason\":\"其他原因\"}",
+        "id": 26,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      },
+      {
+        "event_id": 2,
+        "registration_id": 8,
+        "action": "checkin_manual",
+        "details": null,
+        "id": 27,
+        "created_at": "2026-06-14 12:31:00",
+        "updated_at": "2026-06-14 12:31:00"
+      }
+    ]
+  },
+  "sequences": {
+    "organizers": 1,
+    "events": 2,
+    "registrations": 10,
+    "blacklist": 3,
+    "audit_logs": 27
+  }
+}
