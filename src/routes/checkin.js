@@ -7,22 +7,37 @@ const { triggerCallback, writeAuditLog } = require('../utils/callback');
 
 const router = express.Router();
 
+function buildCheckinResponse(reg, evt) {
+  return {
+    id: reg.id,
+    event_id: reg.event_id,
+    event_title: evt.title,
+    event_location: evt.location,
+    start_time: evt.start_time,
+    end_time: evt.end_time,
+    user_name: reg.user_name,
+    user_identifier: reg.user_identifier,
+    user_phone: reg.user_phone,
+    user_email: reg.user_email,
+    form_data: parseJson(reg.form_data),
+    checkin_code: reg.checkin_code
+  };
+}
+
 router.post('/verify', (req, res) => {
   const { code } = req.body;
   if (!code) {
     return error(res, '签到码不能为空');
   }
 
-  const registration = db.prepare(`
-    SELECT r.*, e.title as event_title, e.location as event_location, e.start_time, e.organizer_id, o.name as organizer_name
-    FROM registrations r
-    JOIN events e ON r.event_id = e.id
-    JOIN organizers o ON e.organizer_id = o.id
-    WHERE r.checkin_code = ?
-  `).get(code);
-
+  const registration = db.prepare('SELECT * FROM registrations WHERE checkin_code = ?').get(code);
   if (!registration) {
     return error(res, '签到码无效', 404);
+  }
+
+  const event = db.prepare('SELECT * FROM events WHERE id = ?').get(registration.event_id);
+  if (!event) {
+    return error(res, '对应活动不存在', 404);
   }
 
   if (registration.status !== 'approved') {
@@ -30,15 +45,11 @@ router.post('/verify', (req, res) => {
   }
 
   if (registration.checkin_status === 'checked_in') {
+    const resp = buildCheckinResponse(registration, event);
+    resp.checkin_time = registration.checkin_time;
     return success(res, {
       already_checked_in: true,
-      registration: {
-        id: registration.id,
-        event_id: registration.event_id,
-        event_title: registration.event_title,
-        user_name: registration.user_name,
-        checkin_time: registration.checkin_time
-      }
+      registration: resp
     }, '已重复签到，首次签到时间：' + registration.checkin_time);
   }
 
@@ -47,29 +58,24 @@ router.post('/verify', (req, res) => {
     WHERE id = ?
   `).run(registration.id);
 
+  const checkinTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
+  const resp = buildCheckinResponse(registration, event);
+  resp.checkin_time = checkinTime;
+
   writeAuditLog(registration.event_id, registration.id, 'checkin_success', null);
-  triggerCallback(registration.organizer_id, 'checkin.success', {
+  triggerCallback(event.organizer_id, 'checkin.success', {
     id: registration.id,
     event_id: registration.event_id,
+    event_title: event.title,
+    event_location: event.location,
     user_name: registration.user_name,
     user_identifier: registration.user_identifier,
-    checkin_time: new Date().toISOString()
+    checkin_time: checkinTime
   });
 
   return success(res, {
     already_checked_in: false,
-    registration: {
-      id: registration.id,
-      event_id: registration.event_id,
-      event_title: registration.event_title,
-      event_location: registration.event_location,
-      start_time: registration.start_time,
-      user_name: registration.user_name,
-      user_phone: registration.user_phone,
-      user_email: registration.user_email,
-      form_data: parseJson(registration.form_data),
-      checkin_time: new Date().toISOString()
-    }
+    registration: resp
   }, '签到成功');
 });
 
@@ -94,7 +100,9 @@ router.post('/manual', authRequired, (req, res) => {
   }
 
   if (registration.checkin_status === 'checked_in') {
-    return success(res, { already_checked_in: true, checkin_time: registration.checkin_time }, '已重复签到');
+    const resp = buildCheckinResponse(registration, event);
+    resp.checkin_time = registration.checkin_time;
+    return success(res, { already_checked_in: true, registration: resp }, '已重复签到');
   }
 
   db.prepare(`
@@ -102,23 +110,25 @@ router.post('/manual', authRequired, (req, res) => {
     WHERE id = ?
   `).run(registration.id);
 
+  const checkinTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
+  const resp = buildCheckinResponse(registration, event);
+  resp.checkin_time = checkinTime;
+
   writeAuditLog(event_id, registration.id, 'checkin_manual', null);
   triggerCallback(req.organizer.id, 'checkin.success', {
     id: registration.id,
     event_id,
+    event_title: event.title,
+    event_location: event.location,
     user_name: registration.user_name,
     user_identifier: registration.user_identifier,
-    checkin_time: new Date().toISOString(),
+    checkin_time: checkinTime,
     manual: true
   });
 
   return success(res, {
     already_checked_in: false,
-    registration: {
-      id: registration.id,
-      user_name: registration.user_name,
-      checkin_time: new Date().toISOString()
-    }
+    registration: resp
   }, '签到成功');
 });
 
@@ -130,7 +140,7 @@ router.get('/event/:eventId/stats', (req, res) => {
     return error(res, '活动不存在', 404);
   }
 
-  const total = db.prepare('SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status != ?').get(req.params.eventId, 'cancelled').count;
+  const total = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status != 'cancelled'").get(req.params.eventId).count;
   const approved = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status = 'approved'").get(req.params.eventId).count;
   const pending = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status = 'pending'").get(req.params.eventId).count;
   const waitlist = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status = 'waitlist'").get(req.params.eventId).count;
@@ -196,26 +206,25 @@ router.get('/event/:eventId/export', (req, res) => {
       checked_in: '已签到'
     };
     return {
-      报名ID: r.id,
-      用户标识: r.user_identifier,
-      姓名: r.user_name,
-      手机号: r.user_phone || '',
-      邮箱: r.user_email || '',
-      状态: statusMap[r.status] || r.status,
-      候补序号: r.queue_position || '',
-      签到状态: checkinMap[r.checkin_status] || r.checkin_status,
-      签到时间: r.checkin_time || '',
-      报名时间: r.created_at,
-      审核通过时间: r.approved_at || '',
-      取消时间: r.cancelled_at || '',
+      ID: r.id,
+      user_identifier: r.user_identifier,
+      name: r.user_name,
+      phone: r.user_phone || '',
+      email: r.user_email || '',
+      status: statusMap[r.status] || r.status,
+      queue_position: r.queue_position || '',
+      checkin_status: checkinMap[r.checkin_status] || r.checkin_status,
+      checkin_time: r.checkin_time || '',
+      created_at: r.created_at,
+      approved_at: r.approved_at || '',
+      cancelled_at: r.cancelled_at || '',
       ...formData
     };
   });
 
-  const fields = Object.keys(rows[0] || [
-    '报名ID', '用户标识', '姓名', '手机号', '邮箱', '状态', '候补序号',
-    '签到状态', '签到时间', '报名时间', '审核通过时间', '取消时间'
-  ]);
+  const defaultFields = ['ID', 'user_identifier', 'name', 'phone', 'email', 'status', 'queue_position',
+    'checkin_status', 'checkin_time', 'created_at', 'approved_at', 'cancelled_at'];
+  const fields = rows.length > 0 ? Object.keys(rows[0]) : defaultFields;
 
   try {
     const parser = new Parser({ fields });

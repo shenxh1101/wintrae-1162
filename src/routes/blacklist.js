@@ -34,18 +34,18 @@ router.post('/', (req, res) => {
     return error(res, '用户标识为必填项');
   }
 
-  try {
-    const result = db.prepare(`INSERT INTO blacklist (organizer_id, user_identifier, reason) VALUES (?, ?, ?)`).run(
-      req.organizer.id, user_identifier, reason || null
-    );
-    writeAuditLog(null, null, 'blacklist_added', { user_identifier, reason });
-    return success(res, { id: result.lastInsertRowid }, '已加入黑名单');
-  } catch (err) {
-    if (err.message.includes('UNIQUE')) {
-      return error(res, '该用户已在黑名单中');
-    }
-    return error(res, err.message);
+  const existing = db.prepare('SELECT id FROM blacklist WHERE organizer_id = ? AND user_identifier = ?').get(
+    req.organizer.id, user_identifier
+  );
+  if (existing) {
+    return error(res, '该用户已在黑名单中，请勿重复添加');
   }
+
+  const result = db.prepare(`INSERT INTO blacklist (organizer_id, user_identifier, reason) VALUES (?, ?, ?)`).run(
+    req.organizer.id, user_identifier, reason || null
+  );
+  writeAuditLog(null, null, 'blacklist_added', { user_identifier, reason });
+  return success(res, { id: result.lastInsertRowid }, '已加入黑名单');
 });
 
 router.delete('/:id', (req, res) => {
@@ -63,7 +63,7 @@ router.get('/check/:user_identifier', (req, res) => {
   const item = db.prepare('SELECT * FROM blacklist WHERE organizer_id = ? AND user_identifier = ?').get(
     req.organizer.id, req.params.user_identifier
   );
-  return success(res, { in_blacklist: !!item, reason: item?.reason || null });
+  return success(res, { in_blacklist: !!item, reason: item ? item.reason : null });
 });
 
 module.exports = router;

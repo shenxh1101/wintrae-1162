@@ -9,18 +9,22 @@ const { triggerCallback, writeAuditLog } = require('../utils/callback');
 
 const router = express.Router();
 
-router.get('/public/:eventId', (req, res) => {
-  const event = db.prepare(`
-    SELECT e.*, o.name as organizer_name
-    FROM events e
-    JOIN organizers o ON e.organizer_id = o.id
-    WHERE e.id = ? AND e.status = 'published'
-  `).get(req.params.eventId);
+function findRegistrationWithEvent(regId, organizerId) {
+  const reg = db.prepare('SELECT * FROM registrations WHERE id = ?').get(regId);
+  if (!reg) return null;
+  const evt = db.prepare('SELECT * FROM events WHERE id = ?').get(reg.event_id);
+  if (!evt) return null;
+  if (organizerId !== undefined && evt.organizer_id !== organizerId) return null;
+  return { reg, evt };
+}
 
-  if (!event) {
+router.get('/public/:eventId', (req, res) => {
+  const event = db.prepare('SELECT * FROM events WHERE id = ?').get(req.params.eventId);
+  if (!event || event.status !== 'published') {
     return error(res, '活动不存在或未发布', 404);
   }
 
+  const organizer = db.prepare('SELECT name FROM organizers WHERE id = ?').get(event.organizer_id);
   const approvedCount = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status = 'approved'").get(event.id).count;
   const waitlistCount = db.prepare("SELECT COUNT(*) as count FROM registrations WHERE event_id = ? AND status = 'waitlist'").get(event.id).count;
 
@@ -31,7 +35,7 @@ router.get('/public/:eventId', (req, res) => {
     location: event.location,
     start_time: event.start_time,
     end_time: event.end_time,
-    organizer_name: event.organizer_name,
+    organizer_name: organizer ? organizer.name : '',
     require_approval: !!event.require_approval,
     form_fields: parseJson(event.form_fields),
     stats: {
@@ -154,30 +158,34 @@ router.get('/event/:eventId', (req, res) => {
   const params = [req.params.eventId];
 
   if (status) {
-    whereClause += ' AND status = ?';
+    whereClause += " AND status = ?";
     params.push(status);
   }
 
   if (keyword) {
-    whereClause += ' AND (user_name LIKE ? OR user_phone LIKE ? OR user_email LIKE ? OR user_identifier LIKE ?)';
+    whereClause += " AND (user_name LIKE ? OR user_phone LIKE ? OR user_email LIKE ? OR user_identifier LIKE ?)";
     const kw = `%${keyword}%`;
     params.push(kw, kw, kw, kw);
   }
 
   const registrations = db.prepare(`
     SELECT * FROM registrations ${whereClause}
-    ORDER BY CASE status
-      WHEN 'approved' THEN 1
-      WHEN 'pending' THEN 2
-      WHEN 'waitlist' THEN 3
-      WHEN 'cancelled' THEN 4
-      ELSE 5 END,
-      queue_position ASC NULLS FIRST,
-      created_at ASC
+    ORDER BY created_at ASC
     LIMIT ? OFFSET ?
   `).all(...params, parseInt(page_size), offset);
 
   const total = db.prepare(`SELECT COUNT(*) as count FROM registrations ${whereClause}`).get(...params).count;
+
+  const statusOrder = { approved: 1, pending: 2, waitlist: 3, cancelled: 4, rejected: 5 };
+  registrations.sort((a, b) => {
+    const sa = statusOrder[a.status] || 9;
+    const sb = statusOrder[b.status] || 9;
+    if (sa !== sb) return sa - sb;
+    const qa = a.queue_position || 999999;
+    const qb = b.queue_position || 999999;
+    if (qa !== qb) return qa - qb;
+    return 0;
+  });
 
   return success(res, {
     list: registrations.map(formatRegistration),
@@ -188,26 +196,24 @@ router.get('/event/:eventId', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  const registration = db.prepare(`
-    SELECT r.*, e.title as event_title, e.organizer_id
-    FROM registrations r
-    JOIN events e ON r.event_id = e.id
-    WHERE r.id = ? AND e.organizer_id = ?
-  `).get(req.params.id, req.organizer.id);
-
-  if (!registration) {
+  const found = findRegistrationWithEvent(req.params.id, req.organizer.id);
+  if (!found) {
     return error(res, '报名记录不存在', 404);
   }
 
-  return success(res, formatRegistration(registration));
+  const reg = found.reg;
+  reg.event_title = found.evt.title;
+  reg.organizer_id = found.evt.organizer_id;
+
+  return success(res, formatRegistration(reg));
 });
 
 function formatRegistration(reg) {
-  return {
-    ...reg,
-    form_data: parseJson(reg.form_data),
-    require_approval: undefined
-  };
+  const obj = { ...reg };
+  obj.form_data = parseJson(obj.form_data);
+  delete obj.require_approval;
+  return obj;
 }
 
 module.exports = router;
+module.exports.findRegistrationWithEvent = findRegistrationWithEvent;
