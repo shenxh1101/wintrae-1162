@@ -1,0 +1,21 @@
+{
+  "name": "event-registration-service",
+  "version": "1.0.0",
+  "description": "线下活动报名、候补、签到统一管理后端服务",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "qrcode": "^1.5.3",
+    "uuid": "^9.0.1",
+    "axios": "^1.6.7",
+    "json2csv": "^6.0.0-alpha.2",
+    "cors": "^2.8.5",
+    "express-validator": "^7.0.1"
+  }
+}
